@@ -1,4 +1,4 @@
-package org.sma.project;
+package org.sma.project.agents;
 
 import jade.core.Agent;
 import jade.core.behaviours.*;
@@ -9,6 +9,7 @@ import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /*
  * This is the ResourceAgent class.
@@ -43,9 +44,13 @@ public class ResourceAgent extends Agent {
         dfd.setName(getAID());
         ServiceDescription sd = new ServiceDescription();
         sd.setType("ResourceAgent");
-        sd.setName(getLocalName() + "-ResourceAgent");
+        sd.setName("ResourceAgent");
         dfd.addServices(sd);
-
+        try {
+            TimeUnit.SECONDS.sleep(30);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
         try {
             DFService.register(this, dfd);
         } catch (FIPAException e) {

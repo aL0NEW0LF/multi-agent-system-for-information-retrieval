@@ -1,4 +1,4 @@
-package org.sma.project;
+package org.sma.project.agents;
 
 import jade.core.Agent;
 import jade.core.behaviours.*;
@@ -8,7 +8,8 @@ import jade.domain.DFService;
 import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
-import java.util.*;
+
+import java.util.concurrent.TimeUnit;
 
 /*
 * This is the BrokerAgent class.
@@ -19,7 +20,7 @@ import java.util.*;
 * It will send the result to the UserAgent.
 */
 
-public class BorkerAgent extends Agent {
+public class BrokerAgent extends Agent {
     @Override
     protected void setup() {
         System.out.println("BrokerAgent " + getAID().getName() + " created.");
@@ -44,9 +45,13 @@ public class BorkerAgent extends Agent {
         dfd.setName(getAID());
         ServiceDescription sd = new ServiceDescription();
         sd.setType("BrokerAgent");
-        sd.setName(getLocalName() + "-BrokerAgent");
+        sd.setName("BrokerAgent");
         dfd.addServices(sd);
-
+        try {
+            TimeUnit.SECONDS.sleep(30);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
         try {
             DFService.register(this, dfd);
         } catch (FIPAException e) {

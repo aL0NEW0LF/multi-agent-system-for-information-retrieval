@@ -1,4 +1,4 @@
-package org.sma.project;
+package org.sma.project.agents;
 
 import jade.core.Agent;
 import jade.core.behaviours.*;
@@ -9,6 +9,7 @@ import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /*
 * This is the OntologyAgent class.
@@ -31,9 +32,13 @@ public class OntologyAgent extends Agent {
         dfd.setName(getAID());
         ServiceDescription sd = new ServiceDescription();
         sd.setType("OntologyAgent");
-        sd.setName(getLocalName() + "-OntologyAgent");
+        sd.setName("OntologyAgent");
         dfd.addServices(sd);
-
+        try {
+            TimeUnit.SECONDS.sleep(30);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
         try {
             DFService.register(this, dfd);
         } catch (FIPAException e) {

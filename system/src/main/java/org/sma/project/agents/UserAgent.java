@@ -1,4 +1,4 @@
-package org.sma.project;
+package org.sma.project.agents;
 
 import jade.core.Agent;
 import jade.core.behaviours.*;
@@ -9,6 +9,7 @@ import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /*
  * This is the UserAgent class. This agent takes care of the user's requests.
@@ -32,9 +33,13 @@ public class UserAgent extends Agent {
         dfd.setName(getAID());
         ServiceDescription sd = new ServiceDescription();
         sd.setType("UserAgent");
-        sd.setName(getLocalName() + "-UserAgent");
+        sd.setName("UserAgent");
         dfd.addServices(sd);
-
+        try {
+            TimeUnit.SECONDS.sleep(30);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
         try {
             DFService.register(this, dfd);
         } catch (FIPAException e) {
@@ -80,30 +85,6 @@ public class UserAgent extends Agent {
             if (response != null) {
                 // Print the response
                 System.out.println("UserAgent " + getAID().getName() + " received the response: " + response.getContent());
-            } else {
-                block();
-            }
-        }
-    }
-
-    private class UserExecutionBehaviour extends CyclicBehaviour {
-        @Override
-        public void action() {
-            // Receive the task from the ExecutionAgent
-            MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.REQUEST);
-            ACLMessage task = myAgent.receive(mt);
-
-            if (task != null) {
-                // Print the task
-                System.out.println("UserAgent " + getAID().getName() + " received the task: " + task.getContent());
-
-                // Create the result
-                ACLMessage result = new ACLMessage(ACLMessage.INFORM);
-                result.addReceiver(new jade.core.AID("UserInterface", jade.core.AID.ISLOCALNAME));
-                result.setContent("The result is ready");
-
-                // Send the result to the UserInterface
-                send(result);
             } else {
                 block();
             }
