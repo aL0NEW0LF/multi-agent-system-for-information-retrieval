@@ -28,16 +28,16 @@ public class ResourceAgent extends Agent {
         addBehaviour(new ResourceRequestBehaviour());
 
         // Add the behaviour to send the response to the BrokerAgent
-        addBehaviour(new ResourceResponseBehaviour());
+        //addBehaviour(new ResourceResponseBehaviour());
 
         // Add the behaviour to check the data in the resource its attached to
-        addBehaviour(new ResourceDataBehaviour());
+        //addBehaviour(new ResourceDataBehaviour());
 
         // Add the behaviour to receive the task from the ExecutionAgent
-        addBehaviour(new ResourceTaskBehaviour());
+        //addBehaviour(new ResourceTaskBehaviour());
 
         // Add the behaviour to send task progress to the ExecutionAgent
-        addBehaviour(new ResourceProgressBehaviour());
+        // addBehaviour(new ResourceProgressBehaviour());
 
         // Register the ResourceAgent in the yellow pages
         DFAgentDescription dfd = new DFAgentDescription();
@@ -73,30 +73,39 @@ public class ResourceAgent extends Agent {
         System.out.println("ResourceAgent " + getAID().getName() + " terminating.");
     }
 
-    private class ResourceRequestBehaviour extends OneShotBehaviour {
+    private class ResourceRequestBehaviour extends CyclicBehaviour {
+        ACLMessage NotNullRequest = null;
+        ACLMessage NotNullSubtask = null;
         @Override
         public void action() {
             // Receive the user's request from the BrokerAgent
-            MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.REQUEST);
+            MessageTemplate mt = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.REQUEST),
+                    MessageTemplate.MatchSender(new jade.core.AID("BrokerAgent", jade.core.AID.ISLOCALNAME)));
             ACLMessage request = myAgent.receive(mt);
 
+            MessageTemplate mtt = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.REQUEST),
+                    MessageTemplate.MatchSender(new jade.core.AID("ExecutionAgent", jade.core.AID.ISLOCALNAME)));
+            ACLMessage subtask = myAgent.receive(mtt);
+
             if (request != null) {
-                System.out.println("ResourceAgent received the request from " + request.getSender().getName());
+                NotNullRequest = request;
+            }
+            if (subtask != null) {
+                NotNullSubtask = subtask;
+            }
+
+            if (NotNullRequest != null && NotNullSubtask != null) {
+                System.out.println("ResourceAgent received the task from " + NotNullSubtask.getSender().getName());
+                System.out.println("ResourceAgent received the request from " + NotNullRequest.getSender().getName());
+
+                // Add the behaviour to receive the data
+                addBehaviour(new ResourceDataBehaviour());
+
+                NotNullRequest = null;
+                NotNullSubtask = null;
             } else {
                 block();
             }
-        }
-    }
-
-    private class ResourceResponseBehaviour extends OneShotBehaviour {
-        @Override
-        public void action() {
-            // Send the response to the BrokerAgent
-            ACLMessage response = new ACLMessage(ACLMessage.INFORM);
-            response.addReceiver(new jade.core.AID("BrokerAgent", jade.core.AID.ISLOCALNAME));
-            response.setContent("ResourceAgent response");
-
-            send(response);
         }
     }
 
@@ -125,7 +134,19 @@ public class ResourceAgent extends Agent {
         }
     }
 
-    private class ResourceTaskBehaviour extends CyclicBehaviour {
+    /*private class ResourceResponseBehaviour extends OneShotBehaviour {
+        @Override
+        public void action() {
+            // Send the response to the BrokerAgent
+            ACLMessage response = new ACLMessage(ACLMessage.INFORM);
+            response.addReceiver(new jade.core.AID("BrokerAgent", jade.core.AID.ISLOCALNAME));
+            response.setContent("ResourceAgent response");
+
+            send(response);
+        }
+    }*/
+
+    /*private class ResourceTaskBehaviour extends CyclicBehaviour {
         @Override
         public void action() {
             // Receive the task from the ExecutionAgent
@@ -138,9 +159,9 @@ public class ResourceAgent extends Agent {
                 block();
             }
         }
-    }
+    }*/
 
-    private class ResourceProgressBehaviour extends OneShotBehaviour {
+    /*private class ResourceProgressBehaviour extends OneShotBehaviour {
         @Override
         public void action() {
             // Send task progress to the ExecutionAgent
@@ -150,5 +171,5 @@ public class ResourceAgent extends Agent {
 
             send(progress);
         }
-    }
+    }*/
 }

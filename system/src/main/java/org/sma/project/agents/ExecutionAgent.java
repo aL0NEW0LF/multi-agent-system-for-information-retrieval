@@ -27,17 +27,14 @@ public class ExecutionAgent extends Agent {
         // Add the behaviour to receive the task from the BrokerAgent
         addBehaviour(new ExecutionTaskBehaviour());
 
-        // Add the behaviour to send the task to the ResourceAgent
-        addBehaviour(new ExecutionResourceBehaviour());
-
         // Add the behaviour to receive the task progress from the ResourceAgent
         addBehaviour(new ExecutionProgressBehaviour());
 
         // Add the behaviour to assign the task to the ResourceAgent
-        addBehaviour(new ExecutionAssignBehaviour());
+        //addBehaviour(new ExecutionAssignBehaviour());
 
         // Add the behaviour to send ontology updates to the OntologyAgent
-        addBehaviour(new ExecutionOntologyBehaviour());
+        //addBehaviour(new ExecutionOntologyBehaviour());
 
         // Register the ExecutionAgent in the yellow pages
         DFAgentDescription dfd = new DFAgentDescription();
@@ -74,26 +71,33 @@ public class ExecutionAgent extends Agent {
         @Override
         public void action() {
             // Receive the task from the BrokerAgent
-            MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.REQUEST);
+            MessageTemplate mt = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.INFORM),
+                    MessageTemplate.MatchSender(new jade.core.AID("BrokerAgent", jade.core.AID.ISLOCALNAME)));
             ACLMessage msg = myAgent.receive(mt);
 
             if (msg != null) {
                 // Task received. Process it
                 String task = msg.getContent();
                 System.out.println("Task received: " + task);
+
+                // Add the behaviour to send the task to the ResourceAgent
+                addBehaviour(new ExecutionAssignTaskBehaviour());
+
+                // Add the behaviour to send ontology updates to the OntologyAgent
+                addBehaviour(new ExecutionOntologyBehaviour());
             } else {
                 block();
             }
         }
     }
 
-    private class ExecutionResourceBehaviour extends OneShotBehaviour {
+    private class ExecutionAssignTaskBehaviour extends OneShotBehaviour {
         @Override
         public void action() {
             // Send the task to the ResourceAgent
             ACLMessage request = new ACLMessage(ACLMessage.REQUEST);
             request.addReceiver(new jade.core.AID("ResourceAgent", jade.core.AID.ISLOCALNAME));
-            request.setContent("Task");
+            request.setContent("Subtask");
             myAgent.send(request);
         }
     }
@@ -102,7 +106,8 @@ public class ExecutionAgent extends Agent {
         @Override
         public void action() {
             // Receive the task progress from the ResourceAgent
-            MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.INFORM);
+            MessageTemplate mt = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.INFORM),
+                    MessageTemplate.MatchSender(new jade.core.AID("ResourceAgent", jade.core.AID.ISLOCALNAME)));
             ACLMessage msg = myAgent.receive(mt);
 
             if (msg != null) {
@@ -115,13 +120,13 @@ public class ExecutionAgent extends Agent {
         }
     }
 
-    private class ExecutionAssignBehaviour extends OneShotBehaviour {
+    /*private class ExecutionAssignBehaviour extends OneShotBehaviour {
         @Override
         public void action() {
             // Assign the task to the ResourceAgent
             System.out.println("Task assigned to the ResourceAgent");
         }
-    }
+    }*/
 
     private class ExecutionOntologyBehaviour extends OneShotBehaviour {
         @Override

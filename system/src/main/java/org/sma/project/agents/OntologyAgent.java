@@ -61,7 +61,8 @@ public class OntologyAgent extends Agent {
     private class OntologyUpdateBehaviour extends CyclicBehaviour {
         @Override
         public void action() {
-            MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.INFORM);
+            MessageTemplate mt = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.INFORM),
+                    MessageTemplate.MatchSender(new jade.core.AID("ExecutionAgent", jade.core.AID.ISLOCALNAME)));
             ACLMessage msg = myAgent.receive(mt);
 
             if (msg != null) {

@@ -28,14 +28,11 @@ public class BrokerAgent extends Agent {
         // Add the behaviour to receive the user's request from the UserAgent
         addBehaviour(new BrokerRequestBehaviour());
 
-        // Add the behaviour to send the user's request to the ResourceAgent
-        addBehaviour(new BrokerResourceBehaviour());
-
         // Add the behaviour to receive the response from the ResourceAgent
-        addBehaviour(new BrokerResponseBehaviour());
+        //addBehaviour(new BrokerResponseBehaviour());
 
         // Add the behaviour to send the task to the ExecutionAgent
-        addBehaviour(new BrokerExecutionBehaviour());
+        //addBehaviour(new BrokerExecutionBehaviour());
 
         // Add the behaviour to send the result to the UserAgent
         addBehaviour(new BrokerResultBehaviour());
@@ -61,26 +58,33 @@ public class BrokerAgent extends Agent {
 
     @Override
     protected void takeDown() {
-            System.out.println("BrokerAgent terminated.");
+        System.out.println("BrokerAgent terminated.");
 
-            try {
-                // Deregister from the yellow pages
-                DFService.deregister(this);
-            } catch (FIPAException e) {
-                e.printStackTrace();
-            }
+        try {
+            // Deregister from the yellow pages
+            DFService.deregister(this);
+        } catch (FIPAException e) {
+            e.printStackTrace();
+        }
 
-            // Printout a dismissal message
-            System.out.println("BrokerAgent " + getAID().getName() + " terminating.");
+        // Printout a dismissal message
+        System.out.println("BrokerAgent " + getAID().getName() + " terminating.");
     }
 
     private class BrokerRequestBehaviour extends CyclicBehaviour {
         @Override
         public void action() {
-            MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.REQUEST);
+            MessageTemplate mt = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.REQUEST),
+                    MessageTemplate.MatchSender(new jade.core.AID("UserAgent", jade.core.AID.ISLOCALNAME)));
             ACLMessage msg = myAgent.receive(mt);
 
             if (msg != null) {
+                // Send the response to the ExecutionAgent
+                ACLMessage task = new ACLMessage(ACLMessage.INFORM);
+                task.addReceiver(new jade.core.AID("ExecutionAgent", jade.core.AID.ISLOCALNAME));
+                task.setContent("Task");
+                myAgent.send(task);
+
                 // Send the user's request to the ResourceAgent
                 ACLMessage request = new ACLMessage(ACLMessage.REQUEST);
                 request.addReceiver(new jade.core.AID("ResourceAgent", jade.core.AID.ISLOCALNAME));
@@ -92,25 +96,7 @@ public class BrokerAgent extends Agent {
         }
     }
 
-    private class BrokerResourceBehaviour extends CyclicBehaviour {
-        @Override
-        public void action() {
-            MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.REQUEST);
-            ACLMessage msg = myAgent.receive(mt);
-
-            if (msg != null) {
-                // Send the user's request to the ResourceAgent
-                ACLMessage request = new ACLMessage(ACLMessage.REQUEST);
-                request.addReceiver(new jade.core.AID("ResourceAgent", jade.core.AID.ISLOCALNAME));
-                request.setContent(msg.getContent());
-                myAgent.send(request);
-            } else {
-                block();
-            }
-        }
-    }
-
-    private class BrokerResponseBehaviour extends CyclicBehaviour {
+    /*private class BrokerResponseBehaviour extends CyclicBehaviour {
         @Override
         public void action() {
             MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.INFORM);
@@ -126,9 +112,9 @@ public class BrokerAgent extends Agent {
                 block();
             }
         }
-    }
+    }*/
 
-    private class BrokerExecutionBehaviour extends CyclicBehaviour {
+    /*private class BrokerExecutionBehaviour extends CyclicBehaviour {
         @Override
         public void action() {
             MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.REQUEST);
@@ -144,12 +130,13 @@ public class BrokerAgent extends Agent {
                 block();
             }
         }
-    }
+    }*/
 
     private class BrokerResultBehaviour extends CyclicBehaviour {
         @Override
         public void action() {
-            MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.INFORM);
+            MessageTemplate mt = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.INFORM),
+                    MessageTemplate.MatchSender(new jade.core.AID("ResourceAgent", jade.core.AID.ISLOCALNAME)));
             ACLMessage msg = myAgent.receive(mt);
 
             if (msg != null) {

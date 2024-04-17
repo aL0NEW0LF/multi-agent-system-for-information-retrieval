@@ -79,7 +79,8 @@ public class UserAgent extends Agent {
         @Override
         public void action() {
             // Receive the response from the BrokerAgent
-            MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.INFORM);
+            MessageTemplate mt = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.INFORM),
+                    MessageTemplate.MatchSender(new jade.core.AID("BrokerAgent", jade.core.AID.ISLOCALNAME)));
             ACLMessage response = myAgent.receive(mt);
 
             if (response != null) {
