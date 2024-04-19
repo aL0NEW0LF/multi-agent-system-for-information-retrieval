@@ -44,11 +44,7 @@ public class BrokerAgent extends Agent {
         sd.setType("BrokerAgent");
         sd.setName("BrokerAgent");
         dfd.addServices(sd);
-        try {
-            TimeUnit.SECONDS.sleep(30);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+
         try {
             DFService.register(this, dfd);
         } catch (FIPAException e) {

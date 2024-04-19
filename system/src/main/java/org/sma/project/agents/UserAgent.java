@@ -2,6 +2,8 @@ package org.sma.project.agents;
 
 import jade.core.Agent;
 import jade.core.behaviours.*;
+import jade.gui.GuiAgent;
+import jade.gui.GuiEvent;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.domain.DFService;
@@ -11,19 +13,30 @@ import jade.domain.FIPAAgentManagement.ServiceDescription;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
+import org.sma.project.ui.search;
+
 /*
  * This is the UserAgent class. This agent takes care of the user's requests.
  * It is responsible for sending the user's request to the BrokerAgent.
  * It receives the response from the BrokerAgent.
  * It sends the result to the UserInterface.
  * */
-public class UserAgent extends Agent {
+public class UserAgent extends GuiAgent {
+    // The UserInterface
+    private search userInterface;
+    private ResourceAgent resourceAgent;
     @Override
     protected void setup() {
+        this.resourceAgent = new ResourceAgent();
+
+        // Create and show the UserInterface
+        userInterface = new search(this, resourceAgent);
+        userInterface.show();
+
         System.out.println("UserAgent " + getAID().getName() + " created.");
 
         // Add the behaviour to send the user's request to the BrokerAgent
-        addBehaviour(new UserRequestBehaviour());
+        //addBehaviour(new UserRequestBehaviour());
 
         // Add the behaviour to receive the response from the BrokerAgent
         addBehaviour(new UserResponseBehaviour());
@@ -35,11 +48,7 @@ public class UserAgent extends Agent {
         sd.setType("UserAgent");
         sd.setName("UserAgent");
         dfd.addServices(sd);
-        try {
-            TimeUnit.SECONDS.sleep(30);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+
         try {
             DFService.register(this, dfd);
         } catch (FIPAException e) {
@@ -60,6 +69,20 @@ public class UserAgent extends Agent {
 
         // Printout a dismissal message
         System.out.println("UserAgent " + getAID().getName() + " terminating.");
+    }
+
+    @Override
+    public void onGuiEvent(GuiEvent guiEvent) {
+        // Get the search query from the UserInterface
+        String searchQuery = (String) guiEvent.getParameter(0);
+
+        // Create the user's request
+        ACLMessage request = new ACLMessage(ACLMessage.REQUEST);
+        request.addReceiver(new jade.core.AID("BrokerAgent", jade.core.AID.ISLOCALNAME));
+        request.setContent(searchQuery);
+
+        // Send the request to the BrokerAgent
+        send(request);
     }
 
     private class UserRequestBehaviour extends OneShotBehaviour {

@@ -43,11 +43,7 @@ public class ExecutionAgent extends Agent {
         sd.setType("ExecutionAgent");
         sd.setName("ExecutionAgent");
         dfd.addServices(sd);
-        try {
-            TimeUnit.SECONDS.sleep(30);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+
         try {
             DFService.register(this, dfd);
         } catch (FIPAException e) {
@@ -132,7 +128,7 @@ public class ExecutionAgent extends Agent {
         @Override
         public void action() {
             // Send ontology updates to the OntologyAgent
-            ACLMessage request = new ACLMessage(ACLMessage.REQUEST);
+            ACLMessage request = new ACLMessage(ACLMessage.INFORM);
             request.addReceiver(new jade.core.AID("OntologyAgent", jade.core.AID.ISLOCALNAME));
             request.setContent("Ontology updates");
             myAgent.send(request);

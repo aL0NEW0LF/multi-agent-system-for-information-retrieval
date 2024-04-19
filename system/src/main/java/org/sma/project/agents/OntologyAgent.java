@@ -25,7 +25,7 @@ public class OntologyAgent extends Agent {
         addBehaviour(new OntologyUpdateBehaviour());
 
         // Add the behaviour to validate concepts of the ResourceAgent
-        addBehaviour(new OntologyValidationBehaviour());
+        //addBehaviour(new OntologyValidationBehaviour());
 
         // Register the OntologyAgent in the yellow pages
         DFAgentDescription dfd = new DFAgentDescription();
@@ -34,11 +34,7 @@ public class OntologyAgent extends Agent {
         sd.setType("OntologyAgent");
         sd.setName("OntologyAgent");
         dfd.addServices(sd);
-        try {
-            TimeUnit.SECONDS.sleep(30);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+
         try {
             DFService.register(this, dfd);
         } catch (FIPAException e) {
@@ -69,32 +65,32 @@ public class OntologyAgent extends Agent {
                 // Process the ontology update
                 String ontologyUpdate = msg.getContent();
                 System.out.println("OntologyAgent " + getAID().getName() + " received ontology update: " + ontologyUpdate);
-            } else {
-                block();
-            }
-        }
-    }
-
-    private class OntologyValidationBehaviour extends CyclicBehaviour {
-        @Override
-        public void action() {
-            // Validate concepts of the ResourceAgent
-            MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.REQUEST);
-            ACLMessage request = myAgent.receive(mt);
-
-            if (request != null) {
-                // Process the request
-                String requestContent = request.getContent();
-                System.out.println("OntologyAgent " + getAID().getName() + " received request: " + requestContent);
 
                 // Send the response to the ResourceAgent
                 ACLMessage response = new ACLMessage(ACLMessage.INFORM);
                 response.addReceiver(new jade.core.AID("ResourceAgent", jade.core.AID.ISLOCALNAME));
-                response.setContent("Validating concepts");
+                response.setOntology("Concept-Validation");
                 send(response);
             } else {
                 block();
             }
         }
     }
+
+    /*private class OntologyValidationBehaviour extends CyclicBehaviour {
+        @Override
+        public void action() {
+            // Validate concepts of the ResourceAgent
+            MessageTemplate mt = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.REQUEST),
+                    MessageTemplate.MatchSender(new jade.core.AID("ResourceAgent", jade.core.AID.ISLOCALNAME))));
+            ACLMessage request = myAgent.receive(mt);
+
+            if (request != null) {
+                // Process the request
+
+            } else {
+                block();
+            }
+        }
+    }*/
 }
