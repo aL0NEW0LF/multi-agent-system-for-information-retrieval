@@ -15,6 +15,8 @@ import java.util.concurrent.TimeUnit;
 
 import org.sma.project.ui.search;
 
+import javax.swing.*;
+
 /*
  * This is the UserAgent class. This agent takes care of the user's requests.
  * It is responsible for sending the user's request to the BrokerAgent.
@@ -24,14 +26,13 @@ import org.sma.project.ui.search;
 public class UserAgent extends GuiAgent {
     // The UserInterface
     private search userInterface;
-    private ResourceAgent resourceAgent;
+    private DataFoundListener dataFoundListener;
+    private ClearData clearData;
     @Override
     protected void setup() {
-        this.resourceAgent = new ResourceAgent();
-
         // Create and show the UserInterface
-        userInterface = new search(this, resourceAgent);
-        userInterface.show();
+        this.userInterface = new search(this);
+        this.userInterface.show();
 
         System.out.println("UserAgent " + getAID().getName() + " created.");
 
@@ -71,6 +72,14 @@ public class UserAgent extends GuiAgent {
         System.out.println("UserAgent " + getAID().getName() + " terminating.");
     }
 
+    public void setDataFoundListener(DataFoundListener listener) {
+        this.dataFoundListener = listener;
+    }
+
+    public void setClearData(ClearData clearData) {
+        this.clearData = clearData;
+    }
+
     @Override
     public void onGuiEvent(GuiEvent guiEvent) {
         // Get the search query from the UserInterface
@@ -80,6 +89,10 @@ public class UserAgent extends GuiAgent {
         ACLMessage request = new ACLMessage(ACLMessage.REQUEST);
         request.addReceiver(new jade.core.AID("BrokerAgent", jade.core.AID.ISLOCALNAME));
         request.setContent(searchQuery);
+
+        if (clearData != null) {
+            SwingUtilities.invokeLater(() -> clearData.clearData());
+        }
 
         // Send the request to the BrokerAgent
         send(request);
@@ -109,6 +122,10 @@ public class UserAgent extends GuiAgent {
             if (response != null) {
                 // Print the response
                 System.out.println("UserAgent " + getAID().getName() + " received the response: " + response.getContent());
+
+                if (dataFoundListener != null) {
+                    SwingUtilities.invokeLater(() -> dataFoundListener.onDataFound(response.getContent()));
+                }
             } else {
                 block();
             }

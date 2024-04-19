@@ -8,8 +8,8 @@ import jade.domain.DFService;
 import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
+import org.sma.project.ui.search;
 
-import javax.swing.*;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -24,11 +24,7 @@ import java.io.FileNotFoundException;  // Import this class to handle errors
  * It will send task progress to the ExecutionAgent.
  */
 public class ResourceAgent extends Agent {
-    private DataFoundListener dataFoundListener;
-    private UserAgent userAgent;
-    public void setDataFoundListener(DataFoundListener listener) {
-        this.dataFoundListener = listener;
-    }
+    private search userInterface;
     @Override
     protected void setup() {
         System.out.println("ResourceAgent " + getAID().getName() + " created.");
@@ -138,11 +134,6 @@ public class ResourceAgent extends Agent {
                                 send(response);
 
                                 foundCount++;
-
-                                // Notify the listener
-                                if (dataFoundListener != null) {
-                                    SwingUtilities.invokeLater(() -> dataFoundListener.onDataFound(data));
-                                }
                             }
                         }
                         myReader.close();
