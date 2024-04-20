@@ -1,3 +1,12 @@
+/**
+ * Created by MOHAMED AMINE FAKHRE-EDDINE
+ * Email: mohamedfakhreeddine2019@gmail.com
+ * Github: github.com/aL0NEW0LF
+ * Date: 4/20/2024
+ * Time: 2:12 PM
+ * Project Name: multi-agent-system-for-information-retrieval
+ */
+
 package org.sma.project.agents;
 
 import jade.core.Agent;
@@ -19,7 +28,6 @@ import java.util.concurrent.TimeUnit;
 * It sends the task to the ExecutionAgent.
 * It will send the result to the UserAgent.
 */
-
 public class BrokerAgent extends Agent {
     @Override
     protected void setup() {
@@ -27,12 +35,6 @@ public class BrokerAgent extends Agent {
 
         // Add the behaviour to receive the user's request from the UserAgent
         addBehaviour(new BrokerRequestBehaviour());
-
-        // Add the behaviour to receive the response from the ResourceAgent
-        //addBehaviour(new BrokerResponseBehaviour());
-
-        // Add the behaviour to send the task to the ExecutionAgent
-        //addBehaviour(new BrokerExecutionBehaviour());
 
         // Add the behaviour to send the result to the UserAgent
         addBehaviour(new BrokerResultBehaviour());
@@ -91,42 +93,6 @@ public class BrokerAgent extends Agent {
             }
         }
     }
-
-    /*private class BrokerResponseBehaviour extends CyclicBehaviour {
-        @Override
-        public void action() {
-            MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.INFORM);
-            ACLMessage msg = myAgent.receive(mt);
-
-            if (msg != null) {
-                // Send the response to the ExecutionAgent
-                ACLMessage response = new ACLMessage(ACLMessage.INFORM);
-                response.addReceiver(new jade.core.AID("ExecutionAgent", jade.core.AID.ISLOCALNAME));
-                response.setContent(msg.getContent());
-                myAgent.send(response);
-            } else {
-                block();
-            }
-        }
-    }*/
-
-    /*private class BrokerExecutionBehaviour extends CyclicBehaviour {
-        @Override
-        public void action() {
-            MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.REQUEST);
-            ACLMessage msg = myAgent.receive(mt);
-
-            if (msg != null) {
-                // Send the task to the ExecutionAgent
-                ACLMessage task = new ACLMessage(ACLMessage.REQUEST);
-                task.addReceiver(new jade.core.AID("ExecutionAgent", jade.core.AID.ISLOCALNAME));
-                task.setContent(msg.getContent());
-                myAgent.send(task);
-            } else {
-                block();
-            }
-        }
-    }*/
 
     private class BrokerResultBehaviour extends CyclicBehaviour {
         @Override

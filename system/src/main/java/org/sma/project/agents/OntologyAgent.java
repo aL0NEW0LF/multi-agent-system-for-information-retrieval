@@ -1,3 +1,12 @@
+/**
+ * Created by MOHAMED AMINE FAKHRE-EDDINE
+ * Email: mohamedfakhreeddine2019@gmail.com
+ * Github: github.com/aL0NEW0LF
+ * Date: 4/20/2024
+ * Time: 2:12 PM
+ * Project Name: multi-agent-system-for-information-retrieval
+ */
+
 package org.sma.project.agents;
 
 import jade.core.Agent;
@@ -76,21 +85,4 @@ public class OntologyAgent extends Agent {
             }
         }
     }
-
-    /*private class OntologyValidationBehaviour extends CyclicBehaviour {
-        @Override
-        public void action() {
-            // Validate concepts of the ResourceAgent
-            MessageTemplate mt = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.REQUEST),
-                    MessageTemplate.MatchSender(new jade.core.AID("ResourceAgent", jade.core.AID.ISLOCALNAME))));
-            ACLMessage request = myAgent.receive(mt);
-
-            if (request != null) {
-                // Process the request
-
-            } else {
-                block();
-            }
-        }
-    }*/
 }

@@ -1,3 +1,12 @@
+/**
+ * Created by MOHAMED AMINE FAKHRE-EDDINE
+ * Email: mohamedfakhreeddine2019@gmail.com
+ * Github: github.com/aL0NEW0LF
+ * Date: 4/20/2024
+ * Time: 2:12 PM
+ * Project Name: multi-agent-system-for-information-retrieval
+ */
+
 package org.sma.project.agents;
 
 import jade.core.Agent;
@@ -31,18 +40,6 @@ public class ResourceAgent extends Agent {
 
         // Add the behaviour to receive the user's request from the BrokerAgent
         addBehaviour(new ResourceRequestBehaviour());
-
-        // Add the behaviour to send the response to the BrokerAgent
-        //addBehaviour(new ResourceResponseBehaviour());
-
-        // Add the behaviour to check the data in the resource its attached to
-        //addBehaviour(new ResourceDataBehaviour());
-
-        // Add the behaviour to receive the task from the ExecutionAgent
-        //addBehaviour(new ResourceTaskBehaviour());
-
-        // Add the behaviour to send task progress to the ExecutionAgent
-        // addBehaviour(new ResourceProgressBehaviour());
 
         // Register the ResourceAgent in the yellow pages
         DFAgentDescription dfd = new DFAgentDescription();
@@ -168,102 +165,4 @@ public class ResourceAgent extends Agent {
             }
         }
     }
-
-    /*private class ResourceDataBehaviour extends OneShotBehaviour {
-        @Override
-        public void action() {
-
-            // Check the data in the resources (resources)
-            System.out.println("ResourceAgent checking the data in the resource");
-
-            // Read the data from the resource
-            try {
-                int foundCount = 0;
-
-                for (int i = 1; i <= 3; i++) {
-                    File myObj = new File("src/main/resources/resource" + i + ".txt");
-                    System.out.println("Reading file: " + myObj.getAbsolutePath()); // Print absolute path for debugging
-                    if (!myObj.exists()) {
-                        System.out.println("File not found: " + myObj.getAbsolutePath());
-                        continue; // Skip to the next iteration if the file doesn't exist
-                    }
-
-                    Scanner myReader = new Scanner(myObj);
-                    while (myReader.hasNextLine()) {
-                        String data = myReader.nextLine();
-
-                        if (data.contains("data")) {
-                            // Send the data to the BrokerAgent
-                            ACLMessage response = new ACLMessage(ACLMessage.INFORM);
-                            response.addReceiver(new jade.core.AID("BrokerAgent", jade.core.AID.ISLOCALNAME));
-                            response.setContent(data);
-                            send(response);
-
-                            foundCount++;
-                        }
-                    }
-                    myReader.close();
-
-                    if (foundCount == 0) {
-                        // Send the data to the BrokerAgent
-                        ACLMessage response = new ACLMessage(ACLMessage.INFORM);
-                        response.addReceiver(new jade.core.AID("BrokerAgent", jade.core.AID.ISLOCALNAME));
-                        response.setContent("No data found");
-                        send(response);
-                    }
-                }
-            } catch (FileNotFoundException e) {
-                System.out.println("An error occurred.");
-                e.printStackTrace();
-
-                // Send the error to the BrokerAgent
-                ACLMessage response = new ACLMessage(ACLMessage.INFORM);
-                response.addReceiver(new jade.core.AID("BrokerAgent", jade.core.AID.ISLOCALNAME));
-                response.setContent("An error occurred.");
-                send(response);
-            }
-
-            // Return the data
-            System.out.println("ResourceAgent returned the data");
-        }
-    }*/
-
-    /*private class ResourceResponseBehaviour extends OneShotBehaviour {
-        @Override
-        public void action() {
-            // Send the response to the BrokerAgent
-            ACLMessage response = new ACLMessage(ACLMessage.INFORM);
-            response.addReceiver(new jade.core.AID("BrokerAgent", jade.core.AID.ISLOCALNAME));
-            response.setContent("ResourceAgent response");
-
-            send(response);
-        }
-    }*/
-
-    /*private class ResourceTaskBehaviour extends CyclicBehaviour {
-        @Override
-        public void action() {
-            // Receive the task from the ExecutionAgent
-            MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.REQUEST);
-            ACLMessage task = myAgent.receive(mt);
-
-            if (task != null) {
-                System.out.println("ResourceAgent received the task from " + task.getSender().getName());
-            } else {
-                block();
-            }
-        }
-    }*/
-
-    /*private class ResourceProgressBehaviour extends OneShotBehaviour {
-        @Override
-        public void action() {
-            // Send task progress to the ExecutionAgent
-            ACLMessage progress = new ACLMessage(ACLMessage.INFORM);
-            progress.addReceiver(new jade.core.AID("ExecutionAgent", jade.core.AID.ISLOCALNAME));
-            progress.setContent("ResourceAgent task progress");
-
-            send(progress);
-        }
-    }*/
 }

@@ -1,3 +1,12 @@
+/**
+ * Created by MOHAMED AMINE FAKHRE-EDDINE
+ * Email: mohamedfakhreeddine2019@gmail.com
+ * Github: github.com/aL0NEW0LF
+ * Date: 4/20/2024
+ * Time: 2:12 PM
+ * Project Name: multi-agent-system-for-information-retrieval
+ */
+
 package org.sma.project.agents;
 
 import jade.core.Agent;
@@ -29,12 +38,6 @@ public class ExecutionAgent extends Agent {
 
         // Add the behaviour to receive the task progress from the ResourceAgent
         addBehaviour(new ExecutionProgressBehaviour());
-
-        // Add the behaviour to assign the task to the ResourceAgent
-        //addBehaviour(new ExecutionAssignBehaviour());
-
-        // Add the behaviour to send ontology updates to the OntologyAgent
-        //addBehaviour(new ExecutionOntologyBehaviour());
 
         // Register the ExecutionAgent in the yellow pages
         DFAgentDescription dfd = new DFAgentDescription();
@@ -115,14 +118,6 @@ public class ExecutionAgent extends Agent {
             }
         }
     }
-
-    /*private class ExecutionAssignBehaviour extends OneShotBehaviour {
-        @Override
-        public void action() {
-            // Assign the task to the ResourceAgent
-            System.out.println("Task assigned to the ResourceAgent");
-        }
-    }*/
 
     private class ExecutionOntologyBehaviour extends OneShotBehaviour {
         @Override
